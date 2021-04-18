@@ -2,8 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
-use App\Entity\UserTelephone;
+use App\Entity\UserAddress;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,7 +13,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class CreateUserAction
+class CreateUserAddressAction
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -25,12 +24,15 @@ class CreateUserAction
     {
     }
 
-    #[Route("/users", methods: ["POST"])]
+    #[Route("/user-address", methods: ["POST"])]
     public function __invoke(Request $request): Response
     {
-        $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
-
-        $errors = $this->validator->validate($user);
+        
+        $data = $request->getContent();
+  
+        $address = $this->serializer->deserialize($request->getContent(), UserAddress::class, 'json');
+        
+        $errors = $this->validator->validate($address);
 
         if (count($errors) > 0) {
             $violations = array_map(function(ConstraintViolationInterface $violation) {
@@ -48,14 +50,14 @@ class CreateUserAction
             return new JsonResponse($response, Response::HTTP_BAD_REQUEST);
         }
 
-        $this->entityManager->persist($user);
+        $this->entityManager->persist($address);
         $this->entityManager->flush();
 
         return new JsonResponse([
             'status' => 'ok'
         ], Response::HTTP_CREATED, [
-            'Location' => $this->router->generate('user_get', [
-                'id' => $user->getId()
+            'Location' => $this->router->generate('user-address_get', [
+                'id' => $address->getId()
             ])
         ]);
     }

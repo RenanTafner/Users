@@ -2,8 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
-use App\Entity\UserTelephone;
+use App\Entity\UserPhone;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,7 +13,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class CreateUserAction
+class CreateUserPhoneAction
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -25,12 +24,18 @@ class CreateUserAction
     {
     }
 
-    #[Route("/users", methods: ["POST"])]
+    #[Route("/user-phone", methods: ["POST"])]
     public function __invoke(Request $request): Response
     {
-        $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
+        
+        $data = $request->getContent();
+       // $object = $this->get('serializer')->deserialize($data, UserPhone::class, 'json');
 
-        $errors = $this->validator->validate($user);
+        $phones = $this->serializer->deserialize($request->getContent(), UserPhone::class, 'json');
+
+    
+        
+        $errors = $this->validator->validate($phones);
 
         if (count($errors) > 0) {
             $violations = array_map(function(ConstraintViolationInterface $violation) {
@@ -48,14 +53,14 @@ class CreateUserAction
             return new JsonResponse($response, Response::HTTP_BAD_REQUEST);
         }
 
-        $this->entityManager->persist($user);
+        $this->entityManager->persist($phones);
         $this->entityManager->flush();
 
         return new JsonResponse([
             'status' => 'ok'
         ], Response::HTTP_CREATED, [
-            'Location' => $this->router->generate('user_get', [
-                'id' => $user->getId()
+            'Location' => $this->router->generate('user-phone_get', [
+                'id' => $phones->getId()
             ])
         ]);
     }
