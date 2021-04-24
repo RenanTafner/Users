@@ -44,7 +44,7 @@ class CreateUserPhoneActionTest extends WebTestCase
         $this->assertSame(Response::HTTP_CREATED, $statusCode);
 
         $client->request(method: 'DELETE', uri: '/user-phone/1');
-        $client->request(method: 'DELETE', uri: '/users/'.$userId);
+        $client->request(method: 'DELETE', uri: '/users/'. $userId);
     }
 
     public function test_create_user_phone_with_invalid_data(): void

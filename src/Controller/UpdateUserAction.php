@@ -25,6 +25,7 @@ class UpdateUserAction
         $user = $repository->find($id);
 
         $user->setNome($requestContent['nome']);
+        $user->setEmail($requestContent['sobreNome']);
         $user->setEmail($requestContent['email']);
 
         $this->entityManager->persist($user);
