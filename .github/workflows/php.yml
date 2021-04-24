@@ -37,6 +37,6 @@ jobs:
       - name: Create database schema
         run: bin/console doctrine:schema:create --env test
       - name: Change Permissions
-        run: chmod +x bin/phpunit
+        run: chmod +x vendor/bin/phpunit
       - name: Run functional tests
         run: vendor/bin/phpunit
