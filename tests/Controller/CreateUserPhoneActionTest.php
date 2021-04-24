@@ -5,11 +5,12 @@ namespace App\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class CreateUserActionTest extends WebTestCase
+class CreateUserPhoneActionTest extends WebTestCase
 {
-    public function test_create_user(): void
+    public function test_create_user_phone(): void
     {
         $client = static::createClient();
+
         $client->request(method: 'POST', uri: '/users',
             content: json_encode([
                 'nome' => 'Primeiro teste funcional de nome',
@@ -18,17 +19,28 @@ class CreateUserActionTest extends WebTestCase
             ])
         );
 
+        $client->request(method: 'POST', uri: '/user-phone',
+            content: json_encode([
+                'user'=> '1',
+                'ddd' => '031',
+                'number' => '985011913'
+            ])
+        );
+
         $statusCode = $client->getResponse()->getStatusCode();
-        $this->assertSame(Response::HTTP_CREATED, $statusCode);
         
+        $this->assertSame(Response::HTTP_CREATED, $statusCode);
+
+        $client->request(method: 'DELETE', uri: '/user-phone/1');
+        $client->request(method: 'DELETE', uri: '/users/1');
     }
 
-    public function test_create_user_with_invalid_data(): void
+    public function test_create_user_phone_with_invalid_data(): void
     {
         $client = static::createClient();
-        $client->request(method: 'POST', uri: '/users',
+        $client->request(method: 'POST', uri: '/user-phone',
             content: json_encode([
-                'email' => 'Email do primeiro teste funcional'
+                'ddd' => '031'
             ])
         );
 

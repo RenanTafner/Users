@@ -21,15 +21,15 @@ class GetUserAddressAction
     #[Route("/user-address/{id}", name: "user-address_get", methods: ["GET"])]
     public function __invoke(int $id): Response
     {
-        $repository = $this->entityManager->getRepository(User::class);
-        $user = $repository->find($id);
+        $repository = $this->entityManager->getRepository(UserAddress::class);
+        $userAddress = $repository->find($id);
 
-        if (null === $user) {
+        if (null === $userAddress) {
             return new JsonResponse([
                 'error' => 'User Address not found'
             ], Response::HTTP_NOT_FOUND);
         }
 
-        return JsonResponse::fromJsonString($this->serializer->serialize($user, 'json'));
+        return JsonResponse::fromJsonString($this->serializer->serialize($userAddress, 'json'));
     }
 }

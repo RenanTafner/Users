@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use App\Entity\User;
+use App\Entity\UserPhone;
+use App\Entity\UserAddress;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\ToolsException;
@@ -21,10 +23,14 @@ class TestCase extends WebTestCase
         $this->client = self::createClient();
         $this->em = self::$kernel->getContainer()->get('doctrine')->getManager();
         $tool = new SchemaTool($this->em);
-        $metadata = $this->em->getClassMetadata(User::class);
+        $userMetadata = $this->em->getClassMetadata(User::class);
+        $userPhoneMetadata = $this->em->getClassMetadata(UserPhone::class);
+        $userAddressMetadata = $this->em->getClassMetadata(UserAddress::class);
         $tool->dropDatabase();
         try {
-            $tool->createSchema([$metadata]);
+            $tool->createSchema([$userMetadata]);
+            $tool->createSchema([$userPhoneMetadata]);
+            $tool->createSchema([$userAddressMetadata]);
         } catch (ToolsException $e) {
             $this->fail('Impossível criar o banco de dados: "' . $e->getMessage() . '"');
         }
