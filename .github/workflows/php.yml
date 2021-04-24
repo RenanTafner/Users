@@ -1,0 +1,42 @@
+#./.github/workflows/build.yaml
+name: "Build & Tests"
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: users
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Check runtime version
+        run: php -v && composer --version
+      - name: Install dependencies
+        run: composer install -o
+      - name: Start Mysql
+        run: sudo systemctl start mysql
+      - name: Verify MySQL connection
+        run: |
+          mysql --version
+          sudo apt-get install -y mysql-client
+          mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports['3306'] }} -uroot -proot -e "SHOW DATABASES"
+      - name: Change Permissions
+        run: chmod +x bin/console
+      - name: Create database
+        run: bin/console doctrine:database:create --env test
+      - name: Create database schema
+        run: bin/console doctrine:schema:create --env test
+      - name: Change Permissions
+        run: chmod +x bin/phpunit
+      - name: Run functional tests
+        run: bin/phpunit
