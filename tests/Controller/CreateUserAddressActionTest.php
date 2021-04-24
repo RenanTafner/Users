@@ -5,8 +5,11 @@ namespace App\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
+
 class CreateUserAddressActionTest extends WebTestCase
 {
+
+
     public function test_create_user_address(): void
     {
         $client = static::createClient();
@@ -19,9 +22,21 @@ class CreateUserAddressActionTest extends WebTestCase
             ])
         );
 
+         $client->request(method: 'GET', uri: '/users');
+
+         $user = $client->getResponse()->getContent();
+
+         if($user !== null)
+          $user = json_decode($user);
+        else
+          $user = [];  
+
+         $userId = count($user) > 0 ? $user[0]->id: 0;
+
+
         $client->request(method: 'POST', uri: '/user-address',
             content: json_encode([
-                "user"=>1,
+                "user"=>  $userId,
                 "rua"=>"Rua Olimpia",
                 "numero"=>"123",
                 "complemento"=>"casa 1",
@@ -36,7 +51,8 @@ class CreateUserAddressActionTest extends WebTestCase
         $this->assertSame(Response::HTTP_CREATED, $statusCode);
 
         $client->request(method: 'DELETE', uri: '/user-address/1');
-        $client->request(method: 'DELETE', uri: '/users/1');
+        $client->request(method: 'DELETE', uri: '/users/'. $userId);
+
     }
 
     public function test_create_user_address_with_invalid_data(): void

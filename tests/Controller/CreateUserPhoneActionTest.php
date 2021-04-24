@@ -19,9 +19,21 @@ class CreateUserPhoneActionTest extends WebTestCase
             ])
         );
 
+        $client->request(method: 'GET', uri: '/users');
+
+        $user = $client->getResponse()->getContent();
+
+        if($user !== null)
+         $user = json_decode( $user );
+       else
+         $user = [];  
+
+        
+        $userId = count($user) > 0 ? $user[0]->id : 0;
+
         $client->request(method: 'POST', uri: '/user-phone',
             content: json_encode([
-                'user'=> '1',
+                'user'=> count($user) > 0 ? $user[0]->id : 0,
                 'ddd' => '031',
                 'number' => '985011913'
             ])
@@ -32,7 +44,7 @@ class CreateUserPhoneActionTest extends WebTestCase
         $this->assertSame(Response::HTTP_CREATED, $statusCode);
 
         $client->request(method: 'DELETE', uri: '/user-phone/1');
-        $client->request(method: 'DELETE', uri: '/users/1');
+        $client->request(method: 'DELETE', uri: '/users/'.$userId);
     }
 
     public function test_create_user_phone_with_invalid_data(): void

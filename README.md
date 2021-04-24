@@ -6,9 +6,12 @@
   composer update
 
 # Instalação do Banco de Dados
-  php bin/console docrine:database:create
+  php bin/console doctrine:database:create
   php bin/console doctrine:schema:create
 
+# Instalação MySQL Docker
+
+docker run -p 3306:3306 --name mysql1 -e MYSQL_ROOT_PASSWORD=root -d mysql --default-authentication-plugin=mysql_native_password -h 127.0.0.1
 
 # Iniciar o Servidor
   php -S localhost:8000 -t public

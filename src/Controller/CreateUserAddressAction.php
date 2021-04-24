@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\UserAddress;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,9 +28,30 @@ class CreateUserAddressAction
     #[Route("/user-address", methods: ["POST"])]
     public function __invoke(Request $request): Response
     {
+
         
         $data = $request->getContent();
   
+        $repository = $this->entityManager->getRepository(UserAddress::class);
+        
+        $conn = $this->entityManager->getConnection();
+
+        $sql = 'SELECT * FROM user_address WHERE user_id = :user ';
+
+        $user = $data !== null ? json_decode($data) : [];
+
+
+        if(isset($user->user))
+        {
+          $userAddress = $conn->prepare($sql);
+          $userAddress->execute(['user' => $user->user ]);
+          
+          $dataAddress = $userAddress->fetchAllAssociative();
+
+          if(count($dataAddress) > 0)
+          return new JsonResponse(['message' => 'Usuário ja possui endereço'], Response::HTTP_BAD_REQUEST);
+        }
+     
         $address = $this->serializer->deserialize($request->getContent(), UserAddress::class, 'json');
         
         $errors = $this->validator->validate($address);

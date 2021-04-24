@@ -17,10 +17,12 @@ class TestCase extends WebTestCase
 {
     protected EntityManagerInterface $em;
     protected KernelBrowser $client;
+   
 
     protected function setUp(): void
     {
         $this->client = self::createClient();
+
         $this->em = self::$kernel->getContainer()->get('doctrine')->getManager();
         $tool = new SchemaTool($this->em);
         $userMetadata = $this->em->getClassMetadata(User::class);

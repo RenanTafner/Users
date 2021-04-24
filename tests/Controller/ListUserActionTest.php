@@ -10,23 +10,24 @@ class ListUserActionTest extends TestCase
 {
     public function test_get_list_user_should_return_count_1(): void
     {
-        // preparando meu cenário
-        $user = new User();
-        $user->setNome('Nome User de teste');
-        $user->setSobrenome('Sobrenome User de teste');
-        $user->setEmail('Email User de teste');
-        $this->em->persist($user);
-        $this->em->flush();
+   
+        $this->client->request(method: 'POST', uri: '/users',
+            content: json_encode([
+                'nome' => 'Primeiro teste funcional de nome',
+                'sobrenome' => 'Sobrenome do primeiro teste funcional',
+                'email' => 'Email do primeiro teste funcional'
+            ])
+        );
 
         // executando o cenário
         $usersJson = $this->client->request(method: 'GET', uri: '/users');
+        
+        $body       = $this->client->getResponse()->getContent();
 
-        $usersArray = json_decode($usersJson, true);
+        $body = json_decode($body);
 
         // conferindo o cenário
-        $this->assertGreaterThan(0, count($usersArray));
-
-        $this->client->request(method: 'DELETE', uri: '/users/1');
+        $this->assertGreaterThan(0, count($body));
 
     }
 
